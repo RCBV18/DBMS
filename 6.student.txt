@@ -1,0 +1,89 @@
+Student (Roll_no, Name, Address) 
+Subject (Sub_code, Sub_name) 
+Marks (Roll_no, Sub_code, marks) 
+Write following queries in SQL 
+1. Write an SQL query to show the names of students who scored more than 75 marks in any subject.
+2. Write an SQL query to find the average marks scored in each subject.
+3. Write an SQL query to display student names who live in 'Pune'.
+4. Write an SQL query to list students along with total marks they obtained across all subjects.
+5. Find how many students have failed in the subject “DBMS”. 
+6. Construct suitable view on above schema
+7. Create a stored procedure that takes a student’s Roll_no as input and returns their name, subject names, and marks.
+
+
+
+CREATE TABLE Student (
+    Roll_no INT,
+    Name VARCHAR(50),
+    Address VARCHAR(100)
+);
+
+CREATE TABLE Subject (
+    Sub_code VARCHAR(10),
+    Sub_name VARCHAR(50)
+);
+
+CREATE TABLE Marks (
+    Roll_no INT,
+    Sub_code VARCHAR(10),
+    Marks INT
+);
+
+
+INSERT INTO Student VALUES (1, 'Amit', 'Pune'), (2, 'Rita', 'Mumbai'), (3, 'John', 'Pune');
+
+INSERT INTO Subject VALUES ('S1', 'DBMS'), ('S2', 'Maths');
+
+INSERT INTO Marks VALUES 
+(1, 'S1', 80), (1, 'S2', 70),
+(2, 'S1', 45), (3, 'S1', 60), (3, 'S2', 90);
+
+--1: Students who scored more than 75
+SELECT DISTINCT Name
+FROM Student
+JOIN Marks ON Student.Roll_no = Marks.Roll_no
+WHERE Marks > 75;
+
+--Query 2: Average marks in each subject
+SELECT Sub_code, AVG(Marks) AS Average
+FROM Marks
+GROUP BY Sub_code;
+
+
+--Query 3: Students living in Pune
+SELECT Name FROM Student WHERE Address = 'Pune';
+
+--Query 4: Total marks for each student
+SELECT Student.Name, SUM(Marks.Marks) AS Total
+FROM Student
+JOIN Marks ON Student.Roll_no = Marks.Roll_no
+GROUP BY Student.Name;
+
+--Query 5: Students failed in DBMS (marks < 50)
+SELECT COUNT(*) 
+FROM Marks 
+JOIN Subject ON Marks.Sub_code = Subject.Sub_code
+WHERE Subject.Sub_name = 'DBMS' AND Marks.Marks < 50;
+
+--Create a Simple View
+CREATE VIEW SimpleView AS
+SELECT Student.Name, Subject.Sub_name, Marks.Marks
+FROM Student
+JOIN Marks ON Student.Roll_no = Marks.Roll_no
+JOIN Subject ON Marks.Sub_code = Subject.Sub_code;
+
+ --Stored Procedure to Show Student Details
+DELIMITER //
+
+CREATE PROCEDURE GetStudentInfo(IN rno INT)
+BEGIN
+  SELECT Student.Name, Subject.Sub_name, Marks.Marks
+  FROM Student
+  JOIN Marks ON Student.Roll_no = Marks.Roll_no
+  JOIN Subject ON Marks.Sub_code = Subject.Sub_code
+  WHERE Student.Roll_no = rno;
+END //
+
+DELIMITER ;
+
+CALL GetStudentInfo(1);

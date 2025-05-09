@@ -1,0 +1,74 @@
+Consider database 
+Doctor (Doc Id. Name, Allocated_Slot, Specialization) 
+Patient (PID, Name, suffering_from, Bill) 
+1. Display patient details who are suffering from 'Cold and cough' 
+2. Display doctor details with specialization ='Aurvedic' 
+3. Update Patient bill as discount of 5% on total bill
+4. Write an SQL query to sort the list of patients by their bill in descending order.
+5. Write an SQL query to display total bill collected from all patients.
+6. Write an SQL query to show distinct diseases from the Patient table.
+7. Create a PL/SQL function that takes a patient’s PID as input and returns the bill amount for that patient.
+
+
+
+
+
+-- Doctor table
+CREATE TABLE Doctor (
+    Doc_Id VARCHAR(10),
+    Name VARCHAR(50),
+    Allocated_Slot VARCHAR(20),
+    Specialization VARCHAR(50)
+);
+
+-- Patient table
+CREATE TABLE Patient (
+    PID VARCHAR(10),
+    Name VARCHAR(50),
+    suffering_from VARCHAR(100),
+    Bill DECIMAL(10,2)
+);
+
+
+
+-- Insert into Doctor
+INSERT INTO Doctor VALUES ('D01', 'Dr. Mehta', '9AM-10AM', 'Allopathy');
+INSERT INTO Doctor VALUES ('D02', 'Dr. Sharma', '10AM-11AM', 'Ayurvedic');
+INSERT INTO Doctor VALUES ('D03', 'Dr. Khan', '11AM-12PM', 'Homeopathy');
+
+-- Insert into Patient
+INSERT INTO Patient VALUES ('P01', 'Ravi', 'Cold and cough', 500.00);
+INSERT INTO Patient VALUES ('P02', 'Anita', 'Fever', 700.00);
+INSERT INTO Patient VALUES ('P03', 'Karan', 'Cold and cough', 300.00);
+
+
+SELECT *
+FROM Patient
+WHERE suffering_from = 'Cold and cough';
+
+
+SELECT *
+FROM Doctor
+WHERE Specialization = 'Ayurvedic';
+
+
+UPDATE Patient
+SET Bill = Bill - (Bill * 0.05);
+
+
+SELECT *
+FROM Patient
+ORDER BY Bill DESC;
+
+
+SELECT SUM(Bill) AS total_collected
+FROM Patient;
+
+
+SELECT DISTINCT suffering_from
+FROM Patient;
+
+
+
+
+

@@ -1,0 +1,110 @@
+8
+Consider database 
+User (User Id, Name, Email, Mob.no.) 
+Item (itemID, item-Name, qty, price) 
+Order (Order-ID, Date, Total _bill) 
+1. Display users who ordered books and pen on '17 May 2022' 
+2. Display users whose bill is less than 10000 and greater than 5000 
+3. Write an SQL query to list all items with quantity less than 10.
+4. Write an SQL query to show item names and their prices in descending order of price.
+5. Write an SQL query to calculate the total value of all items (qty × price).
+6. Create a trigger to automatically update the Total_bill in the Order table whenever a new order is inserted.
+
+
+
+
+-- Create Users Table
+CREATE TABLE User (
+    UserId INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    MobNo VARCHAR(15)
+);
+
+-- Insert Data into User Table
+INSERT INTO User (UserId, Name, Email, MobNo) VALUES
+(1, 'John Doe', 'john@example.com', '1234567890'),
+(2, 'Jane Smith', 'jane@example.com', '2345678901'),
+(3, 'Tom Brown', 'tom@example.com', '3456789012');
+
+-- Create Item Table
+CREATE TABLE Item (
+    ItemID INT PRIMARY KEY,
+    ItemName VARCHAR(100),
+    Qty INT,
+    Price DECIMAL(10, 2)
+);
+
+-- Insert Data into Item Table
+INSERT INTO Item (ItemID, ItemName, Qty, Price) VALUES
+(1, 'Book', 15, 300.00),
+(2, 'Pen', 5, 50.00),
+(3, 'Notebook', 20, 120.00),
+(4, 'Pencil', 50, 10.00);
+
+-- Create Order Table
+CREATE TABLE `Order` (
+    OrderID INT PRIMARY KEY,
+    UserId INT,
+    Date DATE,
+    TotalBill DECIMAL(10, 2),
+    FOREIGN KEY (UserId) REFERENCES User(UserId)
+);
+
+-- Insert Data into Order Table
+INSERT INTO `Order` (OrderID, UserId, Date, TotalBill) VALUES
+(1, 1, '2022-05-17', 800.00),
+(2, 2, '2022-05-17', 500.00),
+(3, 1, '2022-05-18', 1200.00),
+(4, 3, '2022-05-17', 3500.00);
+
+
+--Display users who ordered books and pens on '17 May 2022':
+SELECT DISTINCT u.Name
+FROM User u
+JOIN `Order` o ON u.UserId = o.UserId
+JOIN Item i ON i.ItemID = o.OrderID
+WHERE o.Date = '2022-05-17' AND i.ItemName IN ('Book', 'Pen');
+
+--Display users whose bill is less than 10000 and greater than 5000:
+SELECT u.Name, o.TotalBill
+FROM User u
+JOIN `Order` o ON u.UserId = o.UserId
+WHERE o.TotalBill > 5000 AND o.TotalBill < 10000;
+
+
+--List all items with quantity less than 10:
+SELECT ItemName, Qty
+FROM Item
+WHERE Qty < 10;
+
+
+--Show item names and their prices in descending order of price:
+SELECT ItemName, Price
+FROM Item
+ORDER BY Price DESC;
+
+
+--Calculate the total value of all items (quantity × price):
+SELECT ItemName, Qty * Price AS TotalValue
+FROM Item;
+
+
+--Create a trigger to automatically update the TotalBill in the Order table when a new order is inserted:
+DELIMITER $$
+
+CREATE TRIGGER UpdateTotalBill
+AFTER INSERT ON `Order`
+FOR EACH ROW
+BEGIN
+    DECLARE total DECIMAL(10, 2);
+
+    -- This is a simplified example; you would typically need an order-item relation table
+    SELECT SUM(i.Qty * i.Price) INTO total
+    FROM Item i
+    JOIN `Order` o ON o.OrderID = NEW.OrderID;
+    UPDATE `Order` SET TotalBill = total WHERE OrderID = NEW.OrderID;
+END$$
+
+DELIMITER ;
+

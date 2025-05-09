@@ -1,0 +1,119 @@
+Consider the given database:
+Project (project_id, proj_name, chief_arch)
+Employee (emp_id, emp_name)
+Assigned_To (project_id, emp_id)
+Find the SQL queries for the following statements:
+1. Write an SQL query to display project names along with the names of employees assigned to each project.
+2. Write an SQL query to list all unique chief architects from the Project table.
+3. Get details of employees working on project C353: 	
+4. Get the employee number of employees who are not on any project.
+5. Implement Date and Time functions such as date, time, now, day, etc. on either suitable database or instant values passed directly.
+6.Create a trigger to insert project_id, proj_name, and current date into Project_Log whenever a new project is added to the Project table.
+
+
+
+
+
+-- Project table
+CREATE TABLE Project (
+    project_id VARCHAR(10),
+    proj_name VARCHAR(100),
+    chief_arch VARCHAR(50)
+);
+
+-- Employee table
+CREATE TABLE Employee (
+    emp_id VARCHAR(10),
+    emp_name VARCHAR(100)
+);
+
+-- Assigned_To table
+CREATE TABLE Assigned_To (
+    project_id VARCHAR(10),
+    emp_id VARCHAR(10)
+);
+
+
+
+-- Insert into Project
+INSERT INTO Project VALUES ('P101', 'Bridge Construction', 'Mr. Sharma');
+INSERT INTO Project VALUES ('P102', 'Metro Design', 'Ms. Iyer');
+INSERT INTO Project VALUES ('C353', 'Highway Plan', 'Mr. Khan');
+
+-- Insert into Employee
+INSERT INTO Employee VALUES ('E01', 'Ravi');
+INSERT INTO Employee VALUES ('E02', 'Anita');
+INSERT INTO Employee VALUES ('E03', 'Karan');
+INSERT INTO Employee VALUES ('E04', 'Meena');
+
+-- Insert into Assigned_To
+INSERT INTO Assigned_To VALUES ('P101', 'E01');
+INSERT INTO Assigned_To VALUES ('C353', 'E02');
+INSERT INTO Assigned_To VALUES ('C353', 'E03');
+
+
+
+SELECT P.proj_name, E.emp_name
+FROM Project P
+JOIN Assigned_To A ON P.project_id = A.project_id
+JOIN Employee E ON A.emp_id = E.emp_id;
+
+
+SELECT DISTINCT chief_arch
+FROM Project;
+
+
+SELECT E.*
+FROM Employee E
+JOIN Assigned_To A ON E.emp_id = A.emp_id
+WHERE A.project_id = 'C353';
+
+
+
+SELECT emp_id
+FROM Employee
+WHERE emp_id NOT IN (SELECT emp_id FROM Assigned_To);
+
+
+
+-- Current date and time
+SELECT NOW() AS current_datetime;
+
+-- Current date only
+SELECT CURDATE() AS current_date;
+
+-- Current time only
+SELECT CURTIME() AS current_time;
+
+-- Day from current date
+SELECT DAY(CURDATE()) AS day_of_month;
+
+-- Pass specific date and extract day
+SELECT DAY('2025-05-09') AS day_from_given_date;
+
+
+
+
+CREATE TABLE Project_Log (
+    project_id VARCHAR(10),
+    proj_name VARCHAR(100),
+    added_on DATE
+);
+
+
+
+
+DELIMITER //
+
+CREATE TRIGGER log_new_project
+AFTER INSERT ON Project
+FOR EACH ROW
+BEGIN
+    INSERT INTO Project_Log (project_id, proj_name, added_on)
+    VALUES (NEW.project_id, NEW.proj_name, CURDATE());
+END;
+//
+
+DELIMITER ;
+
+

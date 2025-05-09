@@ -1,0 +1,148 @@
+Consider the relational database
+Customer (customer_id, name, email, city)
+Product (product_id, product_name, price, stock)
+Order (order_id, customer_id, order_date, total_amount)
+Order_Item (order_id, product_id, quantity)
+1. List all customers who placed an order after '2024-01-01'.
+2. Display products with stock less than 10.
+3. Show the total number of products ordered by each customer.
+4. Find the total bill amount for each order.
+5. List product names and quantities ordered in each order.
+6. Write a query to find the total amount spent by each customer.
+7. Create a trigger that logs a message into Stock_Log table whenever a product with stock less than 5 is inserted or updated. Log the product name, stock, and alert date.
+
+
+- Customer table
+CREATE TABLE Customer (
+    customer_id VARCHAR(10),
+    name VARCHAR(50),
+    email VARCHAR(100),
+    city VARCHAR(50)
+);
+
+-- Product table
+CREATE TABLE Product (
+    product_id VARCHAR(10),
+    product_name VARCHAR(50),
+    price DECIMAL(10,2),
+    stock INT
+);
+
+-- Order table
+CREATE TABLE `Order` (
+    order_id VARCHAR(10),
+    customer_id VARCHAR(10),
+    order_date DATE,
+    total_amount DECIMAL(10,2)
+);
+
+-- Order_Item table
+CREATE TABLE Order_Item (
+    order_id VARCHAR(10),
+    product_id VARCHAR(10),
+    quantity INT
+);
+
+
+-- Insert into Customer
+INSERT INTO Customer VALUES ('C1', 'Ravi', 'ravi@example.com', 'Delhi');
+INSERT INTO Customer VALUES ('C2', 'Anita', 'anita@example.com', 'Mumbai');
+INSERT INTO Customer VALUES ('C3', 'Karan', 'karan@example.com', 'Chennai');
+
+-- Insert into Product
+INSERT INTO Product VALUES ('P1', 'Laptop', 50000, 15);
+INSERT INTO Product VALUES ('P2', 'Mouse', 500, 8);
+INSERT INTO Product VALUES ('P3', 'Keyboard', 800, 4);
+INSERT INTO Product VALUES ('P4', 'Monitor', 12000, 2);
+
+-- Insert into Order
+INSERT INTO `Order` VALUES ('O1', 'C1', '2024-02-10', 51000);
+INSERT INTO `Order` VALUES ('O2', 'C2', '2023-12-20', 1000);
+INSERT INTO `Order` VALUES ('O3', 'C3', '2024-03-05', 24000);
+
+-- Insert into Order_Item
+INSERT INTO Order_Item VALUES ('O1', 'P1', 1);
+INSERT INTO Order_Item VALUES ('O1', 'P2', 2);
+INSERT INTO Order_Item VALUES ('O2', 'P2', 1);
+INSERT INTO Order_Item VALUES ('O3', 'P4', 2);
+
+
+SELECT DISTINCT C.name
+FROM Customer C
+JOIN `Order` O ON C.customer_id = O.customer_id
+WHERE O.order_date > '2024-01-01';
+
+
+SELECT *
+FROM Product
+WHERE stock < 10;
+
+
+SELECT C.name, SUM(OI.quantity) AS total_products_ordered
+FROM Customer C
+JOIN `Order` O ON C.customer_id = O.customer_id
+JOIN Order_Item OI ON O.order_id = OI.order_id
+GROUP BY C.name;
+
+
+SELECT order_id, total_amount
+FROM `Order`;
+
+
+SELECT O.order_id, P.product_name, OI.quantity
+FROM Order_Item OI
+JOIN Product P ON OI.product_id = P.product_id
+JOIN `Order` O ON O.order_id = OI.order_id
+ORDER BY O.order_id;
+
+
+SELECT C.name, SUM(O.total_amount) AS total_spent
+FROM Customer C
+JOIN `Order` O ON C.customer_id = O.customer_id
+GROUP BY C.name;
+
+
+CREATE TABLE Stock_Log (
+    product_name VARCHAR(50),
+    stock INT,
+    alert_date DATE
+);
+
+
+DELIMITER //
+
+CREATE TRIGGER low_stock_alert
+AFTER INSERT ON Product
+FOR EACH ROW
+BEGIN
+    IF NEW.stock < 5 THEN
+        INSERT INTO Stock_Log (product_name, stock, alert_date)
+        VALUES (NEW.product_name, NEW.stock, CURDATE());
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+DELIMITER //
+
+CREATE TRIGGER low_stock_update_alert
+AFTER UPDATE ON Product
+FOR EACH ROW
+BEGIN
+    IF NEW.stock < 5 THEN
+        INSERT INTO Stock_Log (product_name, stock, alert_date)
+        VALUES (NEW.product_name, NEW.stock, CURDATE());
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+
+
+
+
+

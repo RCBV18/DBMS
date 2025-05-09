@@ -1,0 +1,119 @@
+ Consider the relational database
+ Supplier (sid, sname, address)
+ Parts (pid, pname, color)
+ Catlog (sid, pid, cost)
+ Write SQL queries for the following:
+ 1. Find the name of supplier who supply some red parts.
+ 2. Find the name of all part whose cost is more than Rs. 250.
+ 3. Find the name of all part whose color is green.
+ 4. Find the name of all part supplied by each supplier
+ 5. Write a SQL query to list the supplier names and the names of the parts they supply.
+ 6. Write a stored procedure that accepts a part color as input and displays the names of all parts and their suppliers for that color
+
+
+
+
+
+
+
+CREATE TABLE Supplier (
+    sid VARCHAR(10),
+    sname VARCHAR(50),
+    address VARCHAR(100)
+);
+
+
+
+CREATE TABLE Parts (
+    pid VARCHAR(10),
+    pname VARCHAR(50),
+    color VARCHAR(20)
+);
+
+
+
+CREATE TABLE Catalog (
+    sid VARCHAR(10),
+    pid VARCHAR(10),
+    cost DECIMAL(10,2)
+);
+
+
+
+INSERT INTO Supplier VALUES ('S1', 'Ravi Supplies', 'Delhi');
+INSERT INTO Supplier VALUES ('S2', 'Kiran Traders', 'Mumbai');
+INSERT INTO Supplier VALUES ('S3', 'Anita Goods', 'Chennai');
+
+
+
+
+INSERT INTO Parts VALUES ('P1', 'Bolt', 'Red');
+INSERT INTO Parts VALUES ('P2', 'Nut', 'Green');
+INSERT INTO Parts VALUES ('P3', 'Screw', 'Blue');
+INSERT INTO Parts VALUES ('P4', 'Washer', 'Green');
+
+
+
+INSERT INTO Catalog VALUES ('S1', 'P1', 300.00);
+INSERT INTO Catalog VALUES ('S1', 'P2', 150.00);
+INSERT INTO Catalog VALUES ('S2', 'P2', 275.00);
+INSERT INTO Catalog VALUES ('S2', 'P3', 260.00);
+INSERT INTO Catalog VALUES ('S3', 'P4', 220.00);
+
+
+
+SELECT DISTINCT S.sname
+FROM Supplier S
+JOIN Catalog C ON S.sid = C.sid
+JOIN Parts P ON C.pid = P.pid
+WHERE P.color = 'Red';
+
+
+
+
+SELECT DISTINCT P.pname
+FROM Parts P
+JOIN Catalog C ON P.pid = C.pid
+WHERE C.cost > 250;
+
+
+SELECT pname
+FROM Parts
+WHERE color = 'Green';
+
+
+
+SELECT S.sname, P.pname
+FROM Supplier S
+JOIN Catalog C ON S.sid = C.sid
+JOIN Parts P ON C.pid = P.pid
+ORDER BY S.sname;
+
+
+
+SELECT S.sname, P.pname
+FROM Supplier S
+JOIN Catalog C ON S.sid = C.sid
+JOIN Parts P ON C.pid = P.pid;
+
+
+
+
+DELIMITER //
+
+CREATE PROCEDURE GetPartsByColor(IN input_color VARCHAR(20))
+BEGIN
+    SELECT P.pname, S.sname
+    FROM Parts P
+    JOIN Catalog C ON P.pid = C.pid
+    JOIN Supplier S ON C.sid = S.sid
+    WHERE P.color = input_color;
+END;
+//
+
+DELIMITER ;
+
+
+
+CALL GetPartsByColor('Green');
+

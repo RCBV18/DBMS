@@ -1,0 +1,145 @@
+Consider the relational database
+Product (product_id, product_name, category, price)
+Supplier (supplier_id, supplier_name, city)
+Supplies (supplier_id, product_id, quantity_supplied)
+1. Display all products with price more than ₹500.
+2. List all suppliers from the city 'Pune'.
+3. Display the names of products supplied by 'ABC Suppliers'.
+4. Count the number of products in each category.
+5. List all suppliers who supply more than 100 units of any product.
+6. Find the highest-priced product and its category.
+7. Create a trigger that logs every new product inserted into the Product table into a Product_Log table with the product name, category, and the current date.
+
+
+
+-- Product table
+CREATE TABLE Product (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(100),
+    price DECIMAL(10, 2)
+);
+
+-- Supplier table
+CREATE TABLE Supplier (
+    supplier_id INT PRIMARY KEY,
+    supplier_name VARCHAR(100),
+    city VARCHAR(100)
+);
+
+-- Supplies table
+CREATE TABLE Supplies (
+    supplier_id INT,
+    product_id INT,
+    quantity_supplied INT,
+    FOREIGN KEY (supplier_id) REFERENCES Supplier(supplier_id),
+    FOREIGN KEY (product_id) REFERENCES Product(product_id)
+);
+
+
+-- Products
+INSERT INTO Product VALUES
+(1, 'Laptop', 'Electronics', 55000),
+(2, 'Desk Chair', 'Furniture', 2500),
+(3, 'Monitor', 'Electronics', 7000),
+(4, 'Pen', 'Stationery', 50),
+(5, 'Bookshelf', 'Furniture', 3500);
+
+-- Suppliers
+INSERT INTO Supplier VALUES
+(1, 'ABC Suppliers', 'Pune'),
+(2, 'XYZ Traders', 'Delhi'),
+(3, 'LMN Corp', 'Mumbai');
+
+-- Supplies
+INSERT INTO Supplies VALUES
+(1, 1, 150),
+(1, 2, 80),
+(2, 3, 120),
+(3, 4, 50),
+(2, 5, 130);
+
+
+SELECT * FROM Product
+WHERE price > 500;
+
+
+SELECT * FROM Supplier
+WHERE city = 'Pune';
+
+
+SELECT P.product_name
+FROM Product P
+JOIN Supplies S ON P.product_id = S.product_id
+JOIN Supplier SP ON S.supplier_id = SP.supplier_id
+WHERE SP.supplier_name = 'ABC Suppliers';
+
+
+
+SELECT category, COUNT(*) AS product_count
+FROM Product
+GROUP BY category;
+
+
+
+SELECT DISTINCT SP.supplier_name
+FROM Supplier SP
+JOIN Supplies S ON SP.supplier_id = S.supplier_id
+WHERE S.quantity_supplied > 100;
+
+
+SELECT product_name, category, price
+FROM Product
+WHERE price = (SELECT MAX(price) FROM Product);
+
+
+
+CREATE TABLE Product_Log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(100),
+    log_date DATE
+);
+
+
+
+DELIMITER $$
+
+CREATE TRIGGER log_new_product
+AFTER INSERT ON Product
+FOR EACH ROW
+BEGIN
+    INSERT INTO Product_Log (product_name, category, log_date)
+    VALUES (NEW.product_name, NEW.category, CURDATE());
+END$$
+
+DELIMITER ;
+
+fully working trigger:
+
+-- Step 1: Create log table
+CREATE TABLE Product_Log (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(100),
+    log_date DATE
+);
+
+-- Step 2: Create trigger
+DELIMITER $$
+
+CREATE TRIGGER log_new_product
+AFTER INSERT ON Product
+FOR EACH ROW
+BEGIN
+    INSERT INTO Product_Log (product_name, category, log_date)
+    VALUES (NEW.product_name, NEW.category, CURDATE());
+END$$
+
+DELIMITER ;
+
+
+
+
+
+

@@ -1,0 +1,111 @@
+Consider database
+Borrower (cust_name, loan_num, branch_name)
+Depositor (cust_name, acc_num)
+Branch (branch_name, branch_city, assets)
+1. Display the name of the customer those are depositor as well as saving account (nested query as a depositor)
+2.Display the name of the customer those are not depositor but having saving account (nested query as a depositor)
+3. Select branch_name where assets are less than assets of pune.
+4.Display distinct branch name
+5.Check whether each loan number in the Borrower table is assigned to only one customer.
+6.List the borrowers who do not have a deposit account.
+7.Find the customer names from the Borrower table who also have accounts in   the Depositor table.
+
+
+
+-- Borrower table
+CREATE TABLE Borrower (
+    cust_name VARCHAR(100),
+    loan_num INT,
+    branch_name VARCHAR(100)
+);
+
+-- Depositor table
+CREATE TABLE Depositor (
+    cust_name VARCHAR(100),
+    acc_num INT
+);
+
+-- Branch table
+CREATE TABLE Branch (
+    branch_name VARCHAR(100) PRIMARY KEY,
+    branch_city VARCHAR(100),
+    assets DECIMAL(12, 2)
+);
+
+
+
+-- Branches
+INSERT INTO Branch VALUES
+('PuneBranch', 'Pune', 1000000),
+('DelhiBranch', 'Delhi', 800000),
+('MumbaiBranch', 'Mumbai', 1200000);
+
+-- Borrowers
+INSERT INTO Borrower VALUES
+('John', 101, 'PuneBranch'),
+('Alice', 102, 'DelhiBranch'),
+('David', 103, 'MumbaiBranch'),
+('Sara', 104, 'PuneBranch');
+
+-- Depositors
+INSERT INTO Depositor VALUES
+('John', 201),
+('Emma', 202),
+('David', 203);
+
+
+
+SELECT cust_name
+FROM Depositor
+WHERE cust_name IN (
+    SELECT cust_name FROM Depositor
+);
+
+
+
+
+SELECT DISTINCT cust_name
+FROM Borrower
+WHERE cust_name NOT IN (
+    SELECT cust_name FROM Depositor
+);
+
+
+
+SELECT branch_name
+FROM Branch
+WHERE assets < (
+    SELECT assets FROM Branch WHERE branch_city = 'Pune'
+);
+
+
+SELECT DISTINCT branch_name FROM Branch;
+
+
+
+SELECT loan_num
+FROM Borrower
+GROUP BY loan_num
+HAVING COUNT(DISTINCT cust_name) > 1;
+
+
+
+
+SELECT DISTINCT cust_name
+FROM Borrower
+WHERE cust_name NOT IN (
+    SELECT cust_name FROM Depositor
+);
+
+
+
+SELECT DISTINCT cust_name
+FROM Borrower
+WHERE cust_name IN (
+    SELECT cust_name FROM Depositor
+);
+
+
+
+
+

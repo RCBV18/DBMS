@@ -1,0 +1,127 @@
+Consider the following Relations. It defines the schema of the database application for a bank. It manages the branches and customers of the bank. Customers take loans (borrow money) or open accounts (deposit money) at one or more branches.
+Branch (B_No, B_name, B_city, asset), 
+Customer (C_No,C_Name, C_citystreet)
+Loan(Loan_no, B_name, amount), 
+Account (Acc_No, B_name,Balance)
+Borrower (C_No, Loan_No), 
+Depositor (C_No, Acc_No)
+Answer the following queries in SQL:
+1.Find the names and address of customers who have a loan.
+2. Find the total amount of balance of all the accounts
+3. List all the customers who are borrowers
+4. Write a SQL query to display the names of all customers who have taken a loan from a branch located in 'Pune'.
+5. Display the branch name along with total balance.
+
+
+-- Branch table
+CREATE TABLE Branch (
+    B_No INT PRIMARY KEY,
+    B_name VARCHAR(100),
+    B_city VARCHAR(100),
+    Asset DECIMAL(12, 2)
+);
+
+-- Customer table
+CREATE TABLE Customer (
+    C_No INT PRIMARY KEY,
+    C_Name VARCHAR(100),
+    C_CityStreet VARCHAR(150)
+);
+
+-- Loan table
+CREATE TABLE Loan (
+    Loan_No INT PRIMARY KEY,
+    B_name VARCHAR(100),
+    Amount DECIMAL(10, 2)
+);
+
+-- Account table
+CREATE TABLE Account (
+    Acc_No INT PRIMARY KEY,
+    B_name VARCHAR(100),
+    Balance DECIMAL(10, 2)
+);
+
+-- Borrower table (relationship between customer and loan)
+CREATE TABLE Borrower (
+    C_No INT,
+    Loan_No INT,
+    FOREIGN KEY (C_No) REFERENCES Customer(C_No),
+    FOREIGN KEY (Loan_No) REFERENCES Loan(Loan_No)
+);
+
+-- Depositor table (relationship between customer and account)
+CREATE TABLE Depositor (
+    C_No INT,
+    Acc_No INT,
+    FOREIGN KEY (C_No) REFERENCES Customer(C_No),
+    FOREIGN KEY (Acc_No) REFERENCES Account(Acc_No)
+);
+
+
+
+-- Branches
+INSERT INTO Branch VALUES
+(1, 'MainBranch', 'Pune', 5000000),
+(2, 'CityBranch', 'Mumbai', 3000000),
+(3, 'SubBranch', 'Delhi', 2000000);
+
+-- Customers
+INSERT INTO Customer VALUES
+(101, 'John Smith', 'Pune Street 1'),
+(102, 'Alice Brown', 'Mumbai Lane 2'),
+(103, 'David Lee', 'Delhi Road 3');
+
+-- Loans
+INSERT INTO Loan VALUES
+(201, 'MainBranch', 100000),
+(202, 'CityBranch', 150000),
+(203, 'MainBranch', 200000);
+
+-- Accounts
+INSERT INTO Account VALUES
+(301, 'MainBranch', 50000),
+(302, 'CityBranch', 70000),
+(303, 'SubBranch', 30000);
+
+-- Borrower relationships
+INSERT INTO Borrower VALUES
+(101, 201),
+(102, 202);
+
+-- Depositor relationships
+INSERT INTO Depositor VALUES
+(101, 301),
+(103, 303);
+
+
+SELECT C.C_Name, C.C_CityStreet
+FROM Customer C
+JOIN Borrower B ON C.C_No = B.C_No;
+
+
+SELECT SUM(Balance) AS TotalBalance
+FROM Account;
+
+
+SELECT DISTINCT C.C_Name
+FROM Customer C
+JOIN Borrower B ON C.C_No = B.C_No;
+
+
+SELECT DISTINCT C.C_Name
+FROM Customer C
+JOIN Borrower B ON C.C_No = B.C_No
+JOIN Loan L ON B.Loan_No = L.Loan_No
+JOIN Branch BR ON L.B_name = BR.B_name
+WHERE BR.B_city = 'Pune';
+
+
+
+SELECT B_name, SUM(Balance) AS TotalBalance
+FROM Account
+GROUP BY B_name;
+
+
+
+

@@ -1,0 +1,86 @@
+Consider database 
+Book (Book_id, Book_Name, Author, Price, No_of_Pages)
+1. Display all books from the collection.
+2. Display all books having price greater than 300 .
+3. Display all books having price less than 300 AND No_of_pages greater than 1000 4. Find all books whose name starts with ‘b’
+5. Display all unique author names.
+6. List books sorted by price in descending order.
+7. Display books that have more than 300 pages.
+8. Count the total number of books in the collection.
+9. Find the average price of all books.
+10.Write a PL/SQL stored procedure to increase the price of all books by 10% where the number of pages is more than 500.
+
+
+
+
+
+
+
+
+
+CREATE TABLE Book (
+    Book_id INT PRIMARY KEY,
+    Book_Name VARCHAR(100),
+    Author VARCHAR(100),
+    Price DECIMAL(10, 2),
+    No_of_Pages INT
+);
+
+
+
+INSERT INTO Book (Book_id, Book_Name, Author, Price, No_of_Pages) VALUES
+(1, 'Big Data', 'John Smith', 450.00, 800),
+(2, 'Beginner SQL', 'Alice Brown', 250.00, 1200),
+(3, 'Blockchain Basics', 'David Lee', 350.00, 400),
+(4, 'Business Intelligence', 'Emma White', 500.00, 900),
+(5, 'Biology 101', 'John Smith', 150.00, 1300),
+(6, 'Data Structures', 'Alice Brown', 320.00, 700),
+(7, 'Artificial Intelligence', 'Michael Black', 600.00, 500),
+(8, 'Basics of Programming', 'Olivia Green', 280.00, 1100);
+
+
+SELECT * FROM Book;
+
+
+SELECT * FROM Book
+WHERE Price > 300;
+
+
+SELECT * FROM Book
+WHERE Price < 300 AND No_of_Pages > 1000;
+
+
+SELECT * FROM Book
+WHERE LOWER(Book_Name) LIKE 'b%';
+
+
+
+SELECT DISTINCT Author FROM Book;
+
+
+SELECT * FROM Book
+ORDER BY Price DESC;
+
+
+SELECT * FROM Book
+WHERE No_of_Pages > 300;
+
+
+SELECT COUNT(*) AS TotalBooks FROM Book;
+
+
+SELECT AVG(Price) AS AveragePrice FROM Book;
+
+DELIMITER $$
+
+CREATE PROCEDURE Increase_Price_By_10()
+BEGIN
+    UPDATE Book
+    SET Price = Price * 1.10
+    WHERE No_of_Pages > 500;
+END$$
+
+DELIMITER ;
+
+-- To run the procedure:
+CALL Increase_Price_By_10();

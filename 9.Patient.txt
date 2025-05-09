@@ -1,0 +1,108 @@
+Consider database 
+Doctor (Doc_ID, Name, Specialization, Allocated_Slot)
+Patient (PID, Name, Suffering_From, Bill)
+Appointment (App_ID, PID, Doc_ID, Appointment_Date)
+1. List patients with a bill more than ₹5000.
+2. Count the number of patients suffering from each disease.
+3. Display total bill amount collected from all patients.
+4. Create a trigger that adds a record to the Patient_Log table whenever a new patient is added to the Patient table
+5. Show the highest bill amount from the Patient table.
+6. Show distinct specializations available in the hospital.
+7. List the patient names and their bills in descending order of amount.
+
+
+
+
+-- Doctor table
+CREATE TABLE Doctor (
+    Doc_ID VARCHAR(10),
+    Name VARCHAR(50),
+    Specialization VARCHAR(50),
+    Allocated_Slot VARCHAR(20)
+);
+
+-- Patient table
+CREATE TABLE Patient (
+    PID VARCHAR(10),
+    Name VARCHAR(50),
+    Suffering_From VARCHAR(100),
+    Bill DECIMAL(10,2)
+);
+
+-- Appointment table
+CREATE TABLE Appointment (
+    App_ID VARCHAR(10),
+    PID VARCHAR(10),
+    Doc_ID VARCHAR(10),
+    Appointment_Date DATE
+);
+
+
+
+-- Insert into Doctor
+INSERT INTO Doctor VALUES ('D01', 'Dr. Sharma', 'Cardiology', '9AM-10AM');
+INSERT INTO Doctor VALUES ('D02', 'Dr. Mehta', 'Dermatology', '10AM-11AM');
+INSERT INTO Doctor VALUES ('D03', 'Dr. Rao', 'Orthopedics', '11AM-12PM');
+
+-- Insert into Patient
+INSERT INTO Patient VALUES ('P01', 'Ravi', 'Fever', 3000.00);
+INSERT INTO Patient VALUES ('P02', 'Anita', 'Diabetes', 5500.00);
+INSERT INTO Patient VALUES ('P03', 'Karan', 'Fever', 7000.00);
+INSERT INTO Patient VALUES ('P04', 'Meena', 'Skin Allergy', 2500.00);
+
+-- Insert into Appointment
+INSERT INTO Appointment VALUES ('A01', 'P01', 'D01', '2025-05-01');
+INSERT INTO Appointment VALUES ('A02', 'P02', 'D02', '2025-05-02');
+INSERT INTO Appointment VALUES ('A03', 'P03', 'D01', '2025-05-03');
+INSERT INTO Appointment VALUES ('A04', 'P04', 'D02', '2025-05-04');
+
+
+
+SELECT *
+FROM Patient
+WHERE Bill > 5000;
+
+
+
+
+SELECT Suffering_From, COUNT(*) AS Patient_Count
+FROM Patient
+GROUP BY Suffering_From;
+
+
+SELECT SUM(Bill) AS Total_Bill
+FROM Patient;
+
+
+CREATE TABLE Patient_Log (
+    PID VARCHAR(10),
+    Name VARCHAR(50),
+    Logged_On DATE
+);
+
+
+
+SELECT MAX(Bill) AS Highest_Bill
+FROM Patient;
+
+
+SELECT DISTINCT Specialization
+FROM Doctor;
+
+
+SELECT Name, Bill
+FROM Patient
+ORDER BY Bill DESC;
+
+
+
+
+
+
+
+
+
+
+
+
+
